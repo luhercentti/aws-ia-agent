@@ -14,7 +14,7 @@ import litellm
 from botocore.exceptions import ClientError, NoCredentialsError
 
 class AWSCloudAgent:
-    def __init__(self, model_name: str = "gpt-3.5-turbo"):
+    def __init__(self, model_name: str = "openai/gpt-4o"):
         """Initialize the AWS Cloud Solutions Agent"""
         self.model_name = model_name
         self.aws_session = None
@@ -253,6 +253,10 @@ class AWSCloudAgent:
     def query(self, user_question: str) -> str:
         """Process user query with AWS context"""
         try:
+            # Set the API key in environment if not already set
+            if not os.environ.get("OPENAI_API_KEY") and "openai" in self.model_name.lower():
+                return "Please set your OPENAI_API_KEY environment variable:\nexport OPENAI_API_KEY='your-api-key'"
+            
             # Gather relevant AWS context
             aws_context = self.get_aws_context(user_question)
             
@@ -309,9 +313,9 @@ def main():
     """Main function to run the agent"""
     print("Setting up AWS Cloud Solutions Agent...")
     
-    # You can change the model here - examples:
-    # "gpt-3.5-turbo", "gpt-4.1", "claude-3-sonnet-20240229", etc.
-    model = "gpt-3.5-turbo"
+    # You can change the model here - examples with proper LiteLLM format:
+    # "openai/gpt-3.5-turbo", "openai/gpt-4", "anthropic/claude-3-sonnet-20240229", etc.
+    model = "openai/gpt-4o"
     
     try:
         agent = AWSCloudAgent(model_name=model)
